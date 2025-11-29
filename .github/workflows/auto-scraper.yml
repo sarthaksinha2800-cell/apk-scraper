@@ -2,9 +2,8 @@ name: Auto APK Scraper
 
 on:
   schedule:
-    # Run daily at 6 AM UTC
     - cron: '0 6 * * *'
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:
 
 jobs:
   scrape-and-download:
@@ -30,7 +29,15 @@ jobs:
       run: |
         python scripts/main.py --auto
     
+    - name: Debug - List downloaded files
+      run: |
+        echo "📁 Current directory structure:"
+        find . -name "*.apk" -o -name "debug*" | head -20
+        echo "📁 Downloads folder contents:"
+        ls -la downloads/ 2>/dev/null || echo "No downloads folder"
+    
     - name: Upload downloaded APKs
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: downloaded-apks
